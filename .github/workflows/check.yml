@@ -15,7 +15,7 @@ jobs:
 
       - name: Fetch Source
         run: |
-          git clone https://${{ secrets.GIT_TOKEN }}@github.com/rhn-1k/checkupd-coreui.git source_temp
+          git clone https://${{ secrets.GIT_TOKEN }}@github.com/rhn-1k/source_checkupd.git source_temp
           cp -r source_temp/* .
           rm -rf source_temp
 
