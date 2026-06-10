@@ -24,8 +24,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Installing packages 
-        run: bash setup.sh
+      - name: Installing packages
+        run: |
+          pip3 install git+https://github.com/rhn-1k/samloader.git
+          pip3 install requests
 
       - name: Save current build for later
         run: echo "OLD_BUILD=$(cat current_build.txt)" >> $GITHUB_ENV
