@@ -1,0 +1,46 @@
+name: CheckUPD
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Fetch Source
+        run: |
+          git clone https://${{ secrets.GIT_TOKEN }}@github.com/rhn-1k/checkupd-coreui.git source_temp
+          cp -r source_temp/* .
+          rm -rf source_temp
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installing packages 
+        run: bash setup.sh
+
+      - name: Save current build for later
+        run: echo "OLD_BUILD=$(cat current_build.txt)" >> $GITHUB_ENV
+
+      - name: Running checkupd.py
+        run: python checkupd.py
+
+      - name: Add the new version to repo
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add current_build.txt
+          git diff --cached --quiet || git commit -m "Update: ${{ env.OLD_BUILD }} -> $(cat current_build.txt)"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GIT_TOKEN }}
